@@ -17,11 +17,8 @@ services:
         volumes:
             -   ./:/var/www
         links:
-            - mysql
             - redis
         environment:
-            - "DB_PORT=3306"
-            - "DB_HOST=mysql"
             - "REDIS_PORT=6379"
             - "REDIS_HOST=redis"
     php-cli:
@@ -31,11 +28,8 @@ services:
         volumes:
             - ./:/var/www
         links:
-            - mysql
             - redis
         environment:
-            - "DB_PORT=3306"
-            - "DB_HOST=mysql"
             - "REDIS_PORT=6379"
             - "REDIS_HOST=redis"
         tty: true

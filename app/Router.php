@@ -37,7 +37,7 @@ class Router
                 list($class, $method) = $route['route'];
                 $reflection = new \ReflectionClass($class);
                 $dependencies = $this->getDependencies($reflection);
-                $controller = $reflection->newInstance($dependencies ?? null);
+                $controller = $reflection->newInstance($dependencies ? reset($dependencies) : null);
                 return new Response(Response::HTTP_OK, $controller->{$method}());
             }
         }
@@ -72,7 +72,8 @@ class Router
         return ($route['method'] == $this->method && preg_match($route['rule'], $this->uri));
     }
 
-    // получаем зависимости конструктора контроллера
+    // получаем зависимости конструктора контроллера (будем считать, что в конструкторе будут только валидаторы,
+    // которым нужно передать $_REQUEST)
     private function getDependencies($reflection)
     {
         $params = $reflection->getConstructor()->getParameters();
@@ -82,7 +83,8 @@ class Router
                 throw new RouteException('Unknown class name '.$param->getType());
             }
 
-            $dependencies = new ($param->getType()->getName());
+            $dependency = new \ReflectionClass($param->getType()->getName());
+            $dependencies[] = $dependency->newInstance($_REQUEST);
         }
 
         return $dependencies;

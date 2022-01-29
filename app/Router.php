@@ -37,7 +37,11 @@ class Router
             }
         }
 
-        return new Response(Response::HTTP_NOT_FOUND);
+        return new Response(Response::HTTP_NOT_FOUND,[
+            'message' => 'Route not found',
+            'code' => Response::HTTP_NOT_FOUND,
+            'data' => new \stdClass(),
+        ]);
     }
 
     private function isValidRoute($route)

@@ -29,6 +29,7 @@ class App
     public function run()
     {
         $response = $this->router->resolve();
+        $response->sendJson();
     }
 
     private function loadConfig()

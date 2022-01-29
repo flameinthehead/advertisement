@@ -2,8 +2,10 @@
 
 namespace App;
 
+// класс для работы с ответом (сделано только для json, без абстракций)
 class Response
 {
+    // набор ответов, которые будут использоваться в приложении
     const HTTP_OK = 200;
     const HTTP_BAD_REQUEST = 400;
     const HTTP_NOT_FOUND = 404;

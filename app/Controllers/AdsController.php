@@ -2,18 +2,33 @@
 
 namespace App\Controllers;
 
+use App\Validators\AdsValidator;
+
+// контроллер для работы с объявлениями
+
 class AdsController
 {
-    public function add()
+    private $validator;
+
+    // простой вариант Dependency Injection - прокидывание валидаторов через конструктор
+    public function __construct(AdsValidator $validator)
     {
-        echo "ADD OK";
+        $this->validator = $validator;
     }
 
+    // добавление нового
+    public function add()
+    {
+
+    }
+
+    // открутка
     public function relevant()
     {
 
     }
 
+    // редактирование
     public function edit()
     {
 

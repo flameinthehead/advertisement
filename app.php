@@ -3,6 +3,7 @@
 use App\Exceptions\AppException;
 use App\Router;
 
+
 class App
 {
     const CONFIG = [
@@ -32,6 +33,7 @@ class App
         $response->sendJson();
     }
 
+    // загрузка конфигурационных файлов
     private function loadConfig()
     {
         foreach(self::CONFIG as $alias => $configPath){
@@ -42,6 +44,7 @@ class App
         }
     }
 
+    // конфигурирование хранилища
     private function configureStorage()
     {
         if(!isset($this->config['storage'])){
@@ -61,6 +64,9 @@ class App
                     'host'   => $connectionSettings['host'],
                     'port'   => $connectionSettings['port'],
                 ]);
+                break;
+            default:
+                throw new AppException('Undefined storage connection.');
         }
     }
 }

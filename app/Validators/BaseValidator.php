@@ -8,6 +8,12 @@ abstract class BaseValidator
     const STRING = 'string';
     const NUMERIC = 'numeric';
     const URL = 'url';
+    const ERROR_MESSAGES = [
+        self::REQUIRED => 'Field %s is required',
+        self::STRING => 'Field %s is not string',
+        self::NUMERIC => 'Field %s is not numeric',
+        self::URL => 'Field %s is not url',
+    ];
 
     protected $request;
     protected $errors;
@@ -16,6 +22,13 @@ abstract class BaseValidator
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    public function getFirstErrorMessage()
+    {
+        foreach($this->errors as $fieldName => $rules){
+            return $this->getErrorMessage($fieldName, reset($rules));
+        }
     }
 
     protected function baseValidateValue($value)
@@ -67,5 +80,10 @@ abstract class BaseValidator
     protected static function rules()
     {
         return [];
+    }
+
+    protected static function mapErrorMessage($rule)
+    {
+        return self::ERROR_MESSAGES[$rule] ?? null;
     }
 }

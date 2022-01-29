@@ -38,7 +38,7 @@ class Router
                 $reflection = new \ReflectionClass($class);
                 $dependencies = $this->getDependencies($reflection);
                 $controller = $reflection->newInstance($dependencies ? reset($dependencies) : null);
-                return new Response(Response::HTTP_OK, $controller->{$method}());
+                return $controller->{$method}();
             }
         }
 

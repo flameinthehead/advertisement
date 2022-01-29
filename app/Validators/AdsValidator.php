@@ -21,6 +21,11 @@ class AdsValidator extends BaseValidator
         return empty($this->errors);
     }
 
+    public function getErrorMessage($field, $rule)
+    {
+        return in_array($rule, $this->errors[$field]) ? sprintf(self::mapErrorMessage($rule), $field) : null;
+    }
+
     public static function rules()
     {
         return [

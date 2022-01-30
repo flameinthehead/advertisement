@@ -25,11 +25,24 @@ abstract class BaseValidator
         return $this->errors;
     }
 
+    public function getErrorMessage($field, $rule)
+    {
+        return in_array($rule, $this->errors[$field]) ? sprintf(self::mapErrorMessage($rule), $field) : null;
+    }
+
     public function getFirstErrorMessage()
     {
+        if(!$this->errors){
+            return;
+        }
         foreach($this->errors as $fieldName => $rules){
             return $this->getErrorMessage($fieldName, reset($rules));
         }
+    }
+
+    public function getValidated()
+    {
+        return $this->validated;
     }
 
     protected function baseValidateValue($value)

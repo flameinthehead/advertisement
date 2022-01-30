@@ -11,4 +11,6 @@ interface StorageInterface
     public function setHash($key, $hash = []);
 
     public function getHash($key, $fields = []);
+
+    public function getAll();
 }

@@ -45,7 +45,11 @@ class AdsController
     // открутка
     public function relevant()
     {
-
+        return [
+            'message' => 'OK',
+            'code' => Response::HTTP_OK,
+            'data' => $this->service->relevant(),
+        ];
     }
 
     // редактирование

@@ -26,4 +26,17 @@ class AdsService
 
         return $ads;
     }
+
+    public function relevant()
+    {
+        if(!$ads = $this->entity->getMostExpensive()){
+            throw new AdsException('There is no available ads');
+        }
+
+        if($this->entity->update($ads['id'], ['limit' => --$ads['limit']])){
+            return $ads;
+        }
+
+        return false;
+    }
 }

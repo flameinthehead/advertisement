@@ -54,7 +54,7 @@ abstract class BaseValidator
 
     protected function specifyFieldValidate($field, $value, $fieldRules)
     {
-        $fieldRules = $fieldRules ? explode('|', $fieldRules) : null;
+        $fieldRules = $fieldRules ? $this->ruleAsArray($fieldRules) : null;
 
         if(empty($fieldRules)){
             return;
@@ -108,5 +108,10 @@ abstract class BaseValidator
     protected static function mapErrorMessage($rule)
     {
         return self::ERROR_MESSAGES[$rule] ?? null;
+    }
+
+    protected function ruleAsArray($rule = '')
+    {
+        return explode('|', $rule);
     }
 }

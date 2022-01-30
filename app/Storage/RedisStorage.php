@@ -45,4 +45,15 @@ class RedisStorage implements StorageInterface
 
         return $this->storage->hget($key, $fields);
     }
+
+    public function getAll($searchKey = '')
+    {
+        $list = $this->storage->keys($searchKey);
+        $result = [];
+        foreach ($list as $key) {
+            $result[] = $this->getHash($key);
+        }
+
+        return $result;
+    }
 }

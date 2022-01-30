@@ -42,7 +42,7 @@ class Router
                 $controller = $this->container->get($class);
                 $params = $this->getParams();
 
-                return new Response(Response::HTTP_OK, $controller->{$method}($params));
+                return new Response(Response::HTTP_OK, $controller->{$method}(...$params));
             }
         }
 

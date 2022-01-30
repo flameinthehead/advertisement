@@ -20,10 +20,10 @@ class AdsService
             throw new AdsException('Same advertisement is already exists');
         }
 
-        if(!$this->entity->add($adsRequest)){
+        if(!$ads = $this->entity->add($adsRequest)){
             throw new AdsException('Error during adding advertisement');
         }
 
-        return true;
+        return $ads;
     }
 }

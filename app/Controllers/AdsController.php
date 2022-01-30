@@ -23,8 +23,15 @@ class AdsController
     // добавление нового
     public function add()
     {
-        if($this->validator->validate()){
-            $this->service->add($this->validator->getValidated());
+        if(
+            $this->validator->validate()
+            && ($ads = $this->service->add($this->validator->getValidated()))
+        ){
+            return [
+                'message' => 'OK',
+                'code' => Response::HTTP_OK,
+                'data' => $ads,
+            ];
         } else {
             return [
                 // т.к. у нас по заданию должно быть одно сообщение, берём первое попавшееся

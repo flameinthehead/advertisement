@@ -45,23 +45,10 @@ class Ads
         if($this->storage->save($storageKey, $ads)){
             $this->storage->save('lastId', $lastId);
             $this->storage->save($ads['id'], $storageKey);
-            return $this->checkOnlyFields($ads);
+            return $ads;
         }
 
         return false;
-    }
-
-    // получение самого дорогого объявления
-    public function getMostExpensive()
-    {
-        $all = $this->filterNoLimit($this->storage->findAll(self::REGEX_ADS_KEY));
-
-        if(!$all || !is_array($all)){
-            return;
-        }
-
-        $all = $this->sortByPrice($all);
-        return reset($all);
     }
 
     // получения объявления по числовому id
@@ -80,23 +67,33 @@ class Ads
     public function update($id, $fields = [])
     {
         $ads = $this->get($id);
-        return $this->storage->save($this->storage->find($id), array_merge($ads, $fields));
+        return $this->storage->save(
+            $this->storage->find($id),
+            array_merge($ads, $fields)
+        );
     }
 
-    // приведение значений полей к типу для отправки клиенту
-    public function casts($ads)
+    // получение самого дорогого объявления
+    public function getMostExpensive()
     {
-        foreach($ads as $fieldName => $value){
-            if(!isset($this->casts[$fieldName])){
-                continue;
-            }
+        $all = $this->filterNoLimit($this->storage->findAll(self::REGEX_ADS_KEY));
 
-            if($this->casts[$fieldName] == self::CAST_INT){
-                $ads[$fieldName] = (int)$value;
-            }
+        if(!$all || !is_array($all)){
+            return;
         }
 
-        return $ads;
+        $all = $this->sortByPrice($all);
+        return reset($all);
+    }
+
+    public function getCasts()
+    {
+        return $this->casts;
+    }
+
+    public function getResponseOnly()
+    {
+        return $this->responseOnly;
     }
 
     // ключ для хранилища
@@ -107,21 +104,6 @@ class Ads
         }
 
         return self::ADS_PREFIX_KEY.md5(serialize($ads));
-    }
-
-    // фильтрация лишних полей и сортировка, согласно их порядку
-    private function checkOnlyFields($ads)
-    {
-        if(!$onlyFields = $this->responseOnly){
-            return $ads;
-        }
-
-        $output = [];
-        foreach($onlyFields as $fieldName){
-            $output[$fieldName] = $ads[$fieldName];
-        }
-
-        return $output;
     }
 
     // отсеивание объявлений, у которых закончились показы

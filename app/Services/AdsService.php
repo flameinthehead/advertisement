@@ -24,7 +24,7 @@ class AdsService
             throw new AdsException('Error during adding advertisement');
         }
 
-        return $this->cast($ads);
+        return $this->casts($ads);
     }
 
     public function relevant()
@@ -34,7 +34,7 @@ class AdsService
         }
 
         if($this->entity->update($ads['id'], ['limit' => --$ads['limit']])){
-            return $this->cast($ads);
+            return $this->casts($ads);
         }
 
         return false;
@@ -46,11 +46,39 @@ class AdsService
             throw new AdsException('Invalid during update with id = '.$id);
         }
 
-        return $this->cast($this->entity->get($id));
+        return $this->casts($this->entity->get($id));
     }
 
-    public function cast($ads)
+    // приведение значений полей к типу для отправки клиенту
+    private function casts($ads)
     {
-        return $this->entity->casts($ads);
+        $ads = $this->checkOnlyFields($ads);
+        $casts = $this->entity->getCasts();
+        foreach($ads as $fieldName => $value){
+            if(!isset($casts[$fieldName])){
+                continue;
+            }
+
+            if($casts[$fieldName] == $this->entity::CAST_INT){
+                $ads[$fieldName] = (int)$value;
+            }
+        }
+
+        return $ads;
+    }
+
+    // фильтрация лишних полей и сортировка, согласно их порядку
+    private function checkOnlyFields($ads)
+    {
+        if(!$onlyFields = $this->entity->getResponseOnly()){
+            return $ads;
+        }
+
+        $output = [];
+        foreach($onlyFields as $fieldName){
+            $output[$fieldName] = $ads[$fieldName];
+        }
+
+        return $output;
     }
 }

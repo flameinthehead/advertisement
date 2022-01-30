@@ -39,4 +39,13 @@ class AdsService
 
         return false;
     }
+
+    public function update($id, $fields)
+    {
+        if(!$this->entity->update($id, $fields)){
+            throw new AdsException('Invalid during update with id = '.$id);
+        }
+
+        return $this->entity->get($id);
+    }
 }

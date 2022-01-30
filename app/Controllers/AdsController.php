@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Exceptions\AdsException;
 use App\Response;
 use App\Validators\AdsValidator;
 use App\Services\AdsService;
@@ -53,8 +54,28 @@ class AdsController
     }
 
     // редактирование
-    public function edit()
+    public function edit($id = 0)
     {
+        if(!$id){
+            throw new \InvalidArgumentException('Not specified ads id');
+        }
 
+        if(!$this->validator->validate()){
+            return [
+                'message' => $this->validator->getFirstErrorMessage(),
+                'code' => Response::HTTP_BAD_REQUEST,
+                'data' => new \stdClass(),
+            ];
+        }
+
+        if(!$ads = $this->service->update($id, $this->validator->getValidated())){
+            throw new AdsException('Update failed with id = '.$id);
+        }
+
+        return [
+            'message' => 'OK',
+            'code' => Response::HTTP_OK,
+            'data' => $ads,
+        ];
     }
 }

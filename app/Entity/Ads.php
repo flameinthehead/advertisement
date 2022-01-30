@@ -32,6 +32,7 @@ class Ads
         return !empty($this->storage->getHash($this->getStorageKey($ads)));
     }
 
+    // добавление в хранилище
     public function add($ads)
     {
         $lastId = $this->storage->get('lastId');
@@ -50,6 +51,7 @@ class Ads
         return false;
     }
 
+    // получение самого дорогого объявления
     public function getMostExpensive()
     {
         $all = $this->filterNoLimit($this->storage->getAll(self::REGEX_ADS_KEY));
@@ -64,7 +66,8 @@ class Ads
         return $this->casts($expensiveAds);
     }
 
-    public function update($id, $fields = [])
+    // получения объявления по числовому id
+    public function get($id)
     {
         $hashId = $this->storage->get($id);
         $ads = $this->storage->getHash($hashId);
@@ -72,11 +75,18 @@ class Ads
             throw new AdsException(sprintf('Ads with id = %s not found', $id));
         }
 
+        return $ads;
+    }
+
+    // обновление
+    public function update($id, $fields = [])
+    {
+        $ads = $this->get($id);
         foreach($fields as $field => $value){
             $ads[$field] = $value;
         }
 
-        return $this->storage->setHash($hashId, $ads);
+        return $this->storage->setHash($this->storage->get($id), $ads);
     }
 
     // ключ для хранилища
@@ -104,6 +114,7 @@ class Ads
         return $output;
     }
 
+    // отсеивание объявлений, у которых закончились показы
     private function filterNoLimit($list = [])
     {
         return array_filter($list, function ($item){
@@ -111,6 +122,7 @@ class Ads
         });
     }
 
+    // сортировка по стоимости по убыванию
     private function sortByPrice($list = [])
     {
         usort($list, function ($a, $b){
@@ -123,6 +135,7 @@ class Ads
         return $list;
     }
 
+    // приведение значений полей к типу для отправки клиенту
     private function casts($ads)
     {
         foreach($ads as $fieldName => $value){

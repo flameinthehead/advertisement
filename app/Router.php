@@ -14,6 +14,7 @@ class Router
     private $uri;
     private $possibleRoutes;
     private $container;
+    private $matches;
 
     public function __construct($requestMethod, $requestUri, Container $container)
     {
@@ -39,7 +40,9 @@ class Router
             if($this->assertRoute($route)){
                 list($class, $method) = $route['route'];
                 $controller = $this->container->get($class);
-                return new Response(Response::HTTP_OK, $controller->{$method}());
+                $params = $this->getParams();
+
+                return new Response(Response::HTTP_OK, $controller->{$method}($params));
             }
         }
 
@@ -70,6 +73,18 @@ class Router
     // подходит ли роут для запроса
     private function assertRoute($route)
     {
-        return ($route['method'] == $this->method && preg_match($route['rule'], $this->uri));
+        return ($route['method'] == $this->method && preg_match($route['rule'], $this->uri, $this->matches));
+    }
+
+    private function getParams()
+    {
+        $parameters = [];
+
+        if(isset($this->matches[1])){
+            for($i = 1; $i < count($this->matches); ++$i){
+                $parameters[] = $this->matches[$i];
+            }
+        }
+        return $parameters;
     }
 }

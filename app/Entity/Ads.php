@@ -78,6 +78,7 @@ class Ads
     {
         $all = $this->filterNoLimit($this->storage->findAll(self::REGEX_ADS_KEY));
 
+
         if(!$all || !is_array($all)){
             return;
         }
@@ -110,7 +111,7 @@ class Ads
     private function filterNoLimit($list = [])
     {
         return array_filter($list, function ($item){
-            return ($item['limit'] > 0);
+            return (isset($item['limit']) && $item['limit'] > 0);
         });
     }
 
@@ -118,7 +119,7 @@ class Ads
     private function sortByPrice($list = [])
     {
         usort($list, function ($a, $b){
-            if($a['price'] < $b['price']){
+            if($a['price'] > $b['price']){
                 return -1;
             }
             return 1;

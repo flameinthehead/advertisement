@@ -24,7 +24,7 @@ class AdsController
     public function add()
     {
         if($this->validator->validate()){
-
+            $this->service->add($this->validator->getValidated());
         } else {
             return [
                 // т.к. у нас по заданию должно быть одно сообщение, берём первое попавшееся

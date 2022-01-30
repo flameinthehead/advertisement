@@ -33,6 +33,13 @@ class App
         $response->sendJson();
     }
 
+    public function getConfig($alias = '')
+    {
+        if(isset($this->config[$alias])){
+            return $this->config[$alias];
+        }
+    }
+
     // загрузка конфигурационных файлов
     private function loadConfig()
     {

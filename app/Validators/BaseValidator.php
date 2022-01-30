@@ -18,6 +18,7 @@ abstract class BaseValidator
     protected $request;
     protected $errors;
     protected $rules;
+    protected $validated;
 
     public function getErrors()
     {
@@ -52,6 +53,8 @@ abstract class BaseValidator
                 $this->string($field, $value);
             } elseif($rule == self::NUMERIC) {
                 $this->numeric($field, $value);
+            } elseif($rule == self::URL) {
+                $this->url($field, $value);
             }
         }
     }
@@ -74,6 +77,13 @@ abstract class BaseValidator
     {
         if(!is_numeric($value)){
             $this->errors[$field][] = self::NUMERIC;
+        }
+    }
+
+    protected function url($field, $value)
+    {
+        if(!filter_var($value, FILTER_VALIDATE_URL)){
+            $this->errors[$field][] = self::URL;
         }
     }
 

@@ -1,16 +1,25 @@
 <?php
+use App\Response;
+use DI\ContainerBuilder;
 
-use App\Exceptions\AppException;
-
-error_reporting(E_ALL);
 include_once 'vendor/autoload.php';
+
 include_once 'routes.php';
 include_once 'app.php';
 
 try {
-    $router = new App\Router($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+    $builder = new ContainerBuilder();
+    $builder->addDefinitions('config/di.php');
+    $container = $builder->build();
+
+    $router = new App\Router($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $container);
     $app = new App($router);
     $app->run();
-} catch (AppException $e) {
-    die($e->getMessage());
+} catch (\Exception $e) {
+    $response = new Response(Response::HTTP_BAD_REQUEST,[
+        'message' => $e->getMessage(),
+        'code' => Response::HTTP_BAD_REQUEST,
+        'data' => new \stdClass(),
+    ]);
+    $response->sendJson();
 }

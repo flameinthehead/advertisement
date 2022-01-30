@@ -4,17 +4,20 @@ namespace App\Controllers;
 
 use App\Response;
 use App\Validators\AdsValidator;
+use App\Services\AdsService;
 
 // контроллер для работы с объявлениями
 
 class AdsController
 {
     private $validator;
+    private $service;
 
     // простой вариант Dependency Injection - прокидывание валидаторов через конструктор
-    public function __construct(AdsValidator $validator)
+    public function __construct(AdsValidator $validator, AdsService $service)
     {
         $this->validator = $validator;
+        $this->service = $service;
     }
 
     // добавление нового
@@ -23,12 +26,12 @@ class AdsController
         if($this->validator->validate()){
 
         } else {
-            return new Response(Response::HTTP_OK, [
+            return [
                 // т.к. у нас по заданию должно быть одно сообщение, берём первое попавшееся
                 'message' => $this->validator->getFirstErrorMessage(),
                 'code' => Response::HTTP_BAD_REQUEST,
                 'data' => new \stdClass(),
-            ]);
+            ];
         }
     }
 

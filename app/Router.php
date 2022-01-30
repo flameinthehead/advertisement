@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Exceptions\RouteException;
+use DI\Container;
 
 // система роутинга - правила добавляются в /routes.php
 class Router
@@ -12,12 +13,14 @@ class Router
     private $method;
     private $uri;
     private $possibleRoutes;
+    private $container;
 
-    public function __construct($requestMethod = '', $requestUri = '')
+    public function __construct($requestMethod, $requestUri, Container $container)
     {
         $this->method = $requestMethod;
         $this->uri = $requestUri;
         $this->possibleRoutes = include 'routes.php';
+        $this->container = $container;
     }
 
     // определения ближайшего подходящего роута, просто внедрение зависимостей (нет рекурсивной проверки конструкторов)
@@ -35,10 +38,8 @@ class Router
 
             if($this->assertRoute($route)){
                 list($class, $method) = $route['route'];
-                $reflection = new \ReflectionClass($class);
-                $dependencies = $this->getDependencies($reflection);
-                $controller = $reflection->newInstance($dependencies ? reset($dependencies) : null);
-                return $controller->{$method}();
+                $controller = $this->container->get($class);
+                return new Response(Response::HTTP_NOT_FOUND, $controller->{$method}());
             }
         }
 
@@ -70,23 +71,5 @@ class Router
     private function assertRoute($route)
     {
         return ($route['method'] == $this->method && preg_match($route['rule'], $this->uri));
-    }
-
-    // получаем зависимости конструктора контроллера (будем считать, что в конструкторе будут только валидаторы,
-    // которым нужно передать $_REQUEST)
-    private function getDependencies($reflection)
-    {
-        $params = $reflection->getConstructor()->getParameters();
-        $dependencies = [];
-        foreach ($params as $param) {
-            if(!class_exists($param->getType()->getName())){
-                throw new RouteException('Unknown class name '.$param->getType());
-            }
-
-            $dependency = new \ReflectionClass($param->getType()->getName());
-            $dependencies[] = $dependency->newInstance($_REQUEST);
-        }
-
-        return $dependencies;
     }
 }

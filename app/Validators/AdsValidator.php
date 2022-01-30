@@ -16,6 +16,9 @@ class AdsValidator extends BaseValidator
             $value = $this->request[$fieldName] ?? null;
             $value = $this->baseValidateValue($value);
             $this->specifyFieldValidate($fieldName, $value, $rules);
+            if(!$this->errors || !$this->errors[$fieldName]){
+                $this->validated[$fieldName] = $value;
+            }
         }
 
         return empty($this->errors);

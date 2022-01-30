@@ -4,13 +4,9 @@ namespace App\Storage;
 
 interface StorageInterface
 {
-    public function set($key, $value);
+    public function save($key, $value);
 
-    public function get($key);
+    public function find($key);
 
-    public function setHash($key, $hash = []);
-
-    public function getHash($key, $fields = []);
-
-    public function getAll();
+    public function findAll();
 }

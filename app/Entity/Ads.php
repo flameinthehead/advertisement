@@ -29,23 +29,23 @@ class Ads
     // проверка на дубль
     public function checkExists($ads)
     {
-        return !empty($this->storage->getHash($this->getStorageKey($ads)));
+        return !empty($this->storage->find($this->getStorageKey($ads), true));
     }
 
     // добавление в хранилище
     public function add($ads)
     {
-        $lastId = $this->storage->get('lastId');
+        $lastId = $this->storage->find('lastId');
         if(empty($lastId)){
             $lastId = 0;
         }
 
         $storageKey = $this->getStorageKey($ads);
         $ads['id'] = ++$lastId;
-        if($this->storage->setHash($storageKey, $ads)){
-            $this->storage->set('lastId', $lastId);
-            $this->storage->set($ads['id'], $storageKey);
-            return $this->casts($this->checkOnlyFields($ads));
+        if($this->storage->save($storageKey, $ads)){
+            $this->storage->save('lastId', $lastId);
+            $this->storage->save($ads['id'], $storageKey);
+            return $this->checkOnlyFields($ads);
         }
 
         return false;
@@ -54,23 +54,21 @@ class Ads
     // получение самого дорогого объявления
     public function getMostExpensive()
     {
-        $all = $this->filterNoLimit($this->storage->getAll(self::REGEX_ADS_KEY));
+        $all = $this->filterNoLimit($this->storage->findAll(self::REGEX_ADS_KEY));
 
         if(!$all || !is_array($all)){
             return;
         }
 
         $all = $this->sortByPrice($all);
-        $expensiveAds = reset($all);
-
-        return $this->casts($expensiveAds);
+        return reset($all);
     }
 
     // получения объявления по числовому id
     public function get($id)
     {
-        $hashId = $this->storage->get($id);
-        $ads = $this->storage->getHash($hashId);
+        $hashId = $this->storage->find($id);
+        $ads = $this->storage->find($hashId, true);
         if(!$ads){
             throw new AdsException(sprintf('Ads with id = %s not found', $id));
         }
@@ -82,11 +80,23 @@ class Ads
     public function update($id, $fields = [])
     {
         $ads = $this->get($id);
-        foreach($fields as $field => $value){
-            $ads[$field] = $value;
+        return $this->storage->save($this->storage->find($id), array_merge($ads, $fields));
+    }
+
+    // приведение значений полей к типу для отправки клиенту
+    public function casts($ads)
+    {
+        foreach($ads as $fieldName => $value){
+            if(!isset($this->casts[$fieldName])){
+                continue;
+            }
+
+            if($this->casts[$fieldName] == self::CAST_INT){
+                $ads[$fieldName] = (int)$value;
+            }
         }
 
-        return $this->storage->setHash($this->storage->get($id), $ads);
+        return $ads;
     }
 
     // ключ для хранилища
@@ -133,21 +143,5 @@ class Ads
         });
 
         return $list;
-    }
-
-    // приведение значений полей к типу для отправки клиенту
-    private function casts($ads)
-    {
-        foreach($ads as $fieldName => $value){
-            if(!isset($this->casts[$fieldName])){
-                continue;
-            }
-
-            if($this->casts[$fieldName] == self::CAST_INT){
-                $ads[$fieldName] = (int)$value;
-            }
-        }
-
-        return $ads;
     }
 }

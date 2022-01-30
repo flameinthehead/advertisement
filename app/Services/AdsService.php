@@ -24,7 +24,7 @@ class AdsService
             throw new AdsException('Error during adding advertisement');
         }
 
-        return $ads;
+        return $this->cast($ads);
     }
 
     public function relevant()
@@ -34,7 +34,7 @@ class AdsService
         }
 
         if($this->entity->update($ads['id'], ['limit' => --$ads['limit']])){
-            return $ads;
+            return $this->cast($ads);
         }
 
         return false;
@@ -46,6 +46,11 @@ class AdsService
             throw new AdsException('Invalid during update with id = '.$id);
         }
 
-        return $this->entity->get($id);
+        return $this->cast($this->entity->get($id));
+    }
+
+    public function cast($ads)
+    {
+        return $this->entity->casts($ads);
     }
 }

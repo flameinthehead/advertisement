@@ -39,7 +39,7 @@ class Router
             if($this->assertRoute($route)){
                 list($class, $method) = $route['route'];
                 $controller = $this->container->get($class);
-                return new Response(Response::HTTP_NOT_FOUND, $controller->{$method}());
+                return new Response(Response::HTTP_OK, $controller->{$method}());
             }
         }
 

@@ -18,7 +18,7 @@ class Ads
     // проверка на дубль
     public function checkExists($data)
     {
-        return $this->storage->getHash($this->getStorageKey($data));
+        return !empty($this->storage->getHash($this->getStorageKey($data)));
     }
 
     public function add($data)
@@ -28,9 +28,8 @@ class Ads
             $lastId = 0;
         }
 
-        $data['id'] = ++$lastId;
-
         $storageKey = $this->getStorageKey($data);
+        $data['id'] = ++$lastId;
         if($this->storage->setHash($storageKey, $data)){
             $this->storage->set('lastId', $lastId);
             $this->storage->set($data['id'], $storageKey);

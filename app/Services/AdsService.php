@@ -49,6 +49,11 @@ class AdsService
         return $this->casts($this->entity->get($id));
     }
 
+    public function get($id)
+    {
+        return $this->entity->get($id);
+    }
+
     // приведение значений полей к типу для отправки клиенту
     private function casts($ads)
     {
